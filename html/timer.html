@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style/timer.css">
+</head>
+<body>
+    <div class="container">
+        <div id="status">PRONTO</div>
+        <div id="time">00:00</div>
+        <div class="progress-bar"><div id="progress"></div></div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        let timeLeft, timerInterval, isWork, config;
+
+        ipcRenderer.on('init-timer', (event, data) => {
+            config = data;
+            startPhase(true);
+        });
+
+        ipcRenderer.on('reset-timer', () => {
+            clearInterval(timerInterval);
+            document.getElementById('time').innerText = "00:00";
+            document.getElementById('status').innerText = "STOP";
+        });
+
+        function startPhase(workMode) {
+            clearInterval(timerInterval);
+            isWork = workMode;
+            timeLeft = (isWork ? config.work : config.break) * 60;
+            document.getElementById('status').innerText = isWork ? "LAVORO" : "PAUSA";
+            document.getElementById('status').style.color = isWork ? "#ff453a" : "#32d74b";
+            
+            new Notification("FocusBridge", { body: isWork ? "Torna a lavoro!" : "Prenditi una pausa!" });
+
+            timerInterval = setInterval(() => {
+                if (timeLeft <= 0) { startPhase(!isWork); }
+                else { timeLeft--; updateUI(); }
+            }, 1000);
+        }
+
+        function updateUI() {
+            const min = Math.floor(timeLeft / 60);
+            const sec = timeLeft % 60;
+            document.getElementById('time').innerText = `${min}:${sec < 10 ? '0' : ''}${sec}`;
+            const total = (isWork ? config.work : config.break) * 60;
+            document.getElementById('progress').style.width = (timeLeft / total * 100) + "%";
+            document.getElementById('progress').style.background = isWork ? "#ff453a" : "#32d74b";
+        }
+    </script>
+</body>
+</html>
