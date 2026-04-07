@@ -1,16 +1,29 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../style/timer.css">
 </head>
+
 <body>
     <div class="container">
+        <div class="controls">
+            <button onclick="openDashboard()" title="Dashboard">
+                <img src="../resources/house_icon.svg" alt="Home" width="12" height="12">
+            </button>
+            <button onclick="resetSize()" title="Reset Dimensione">
+                <img src="../resources/arrow_icon.svg" alt="Reset" width="12" height="12">
+            </button>
+        </div>
+    
         <div id="status">PRONTO</div>
         <div id="time">00:00</div>
-        <div class="progress-bar"><div id="progress"></div></div>
+        <div class="progress-bar">
+            <div id="progress"></div>
+        </div>
     </div>
-
+    
     <script>
         const { ipcRenderer } = require('electron');
         let timeLeft, timerInterval, isWork, config;
@@ -32,7 +45,7 @@
             timeLeft = (isWork ? config.work : config.break) * 60;
             document.getElementById('status').innerText = isWork ? "LAVORO" : "PAUSA";
             document.getElementById('status').style.color = isWork ? "#ff453a" : "#32d74b";
-            
+
             new Notification("FocusBridge", { body: isWork ? "Torna a lavoro!" : "Prenditi una pausa!" });
 
             timerInterval = setInterval(() => {
@@ -49,6 +62,16 @@
             document.getElementById('progress').style.width = (timeLeft / total * 100) + "%";
             document.getElementById('progress').style.background = isWork ? "#ff453a" : "#32d74b";
         }
+
+        //bottoni in alto
+        function openDashboard() {
+            ipcRenderer.send('show-dashboard');
+        }
+
+        function resetSize() {
+            ipcRenderer.send('reset-timer-size');
+        }
     </script>
 </body>
+
 </html>

@@ -120,3 +120,21 @@ ipcMain.on('stop-session', () => stopSession());
 app.on('activate', () => {
     if (mainWindow) mainWindow.show();
 });
+
+
+
+// Mostra la dashboard
+ipcMain.on('show-dashboard', () => {
+    if (mainWindow) {
+        mainWindow.show();
+        mainWindow.focus(); 
+    }
+});
+
+// Resetta la dimensione del timer ai valori originali
+ipcMain.on('reset-timer-size', () => {
+    if (timerWindow) {
+        timerWindow.setSize(250, 110);
+        timerWindow.center(); 
+    }
+});
